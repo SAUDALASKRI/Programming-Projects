@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>طقس الطائف</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background orbs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: float 8s ease-in-out infinite;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #56ccf2, #2f80ed);
+      top: -150px; left: -150px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #f7971e, #ffd200);
+      bottom: -100px; right: -100px;
+      animation-delay: -4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(30px) scale(1.05); }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Error card ─── */
+    .error-card {
+      background: rgba(255, 60, 60, 0.15);
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      color: #fff;
+    }
+    .error-card .error-icon { font-size: 3rem; margin-bottom: 16px; }
+    .error-card h2 { font-size: 1.4rem; margin-bottom: 12px; }
+    .error-card p { opacity: 0.75; font-size: 0.9rem; direction: ltr; }
+
+    /* ─── Main card ─── */
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      animation: slideUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Header ─── */
+    .header {
+      background: linear-gradient(135deg, rgba(86,204,242,0.25), rgba(47,128,237,0.25));
+      padding: 36px 32px 28px;
+      text-align: center;
+      color: #fff;
+      position: relative;
+    }
+
+    .city-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.5px;
+    }
+    .city-badge .dot {
+      width: 7px; height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 0 20px rgba(86,204,242,0.5));
+      margin: 0 auto 12px;
+      display: block;
+      animation: iconFloat 4s ease-in-out infinite;
+    }
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .temp-display {
+      font-size: 5.5rem;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.6));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .temp-display sup { font-size: 2.5rem; vertical-align: super; }
+
+    .description {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 16px;
+      text-transform: capitalize;
+    }
+
+    .feels-like {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ─── Min/Max strip ─── */
+    .minmax {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .minmax span {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .minmax .arrow { font-size: 1rem; }
+    .arrow-up { color: #f87171; }
+    .arrow-down { color: #60a5fa; }
+
+    /* ─── Stats grid ─── */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.04);
+      padding: 22px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: background 0.2s;
+    }
+    .stat:hover { background: rgba(255,255,255,0.09); }
+
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .icon-blue  { background: rgba(96,165,250,0.18); }
+    .icon-green { background: rgba(74,222,128,0.18); }
+    .icon-orange{ background: rgba(251,146,60,0.18); }
+    .icon-purple{ background: rgba(167,139,250,0.18); }
+    .icon-teal  { background: rgba(45,212,191,0.18); }
+    .icon-pink  { background: rgba(244,114,182,0.18); }
+
+    .stat-info { color: #fff; }
+    .stat-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .stat-unit {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      font-weight: 400;
+      margin-right: 3px;
+    }
+
+    /* ─── Sun strip ─── */
+    .sun-strip {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(255,255,255,0.04);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sun-item {
+      text-align: center;
+      color: #fff;
+    }
+    .sun-item .sun-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .sun-item .sun-label {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 4px;
+    }
+    .sun-item .sun-time { font-size: 1rem; font-weight: 700; }
+
+    /* ─── Footer ─── */
+    .footer {
+      padding: 16px 24px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ─── Refresh button ─── */
+    .refresh-btn {
+      display: block;
+      margin: 18px auto 0;
+      padding: 12px 32px;
+      background: rgba(86,204,242,0.15);
+      border: 1px solid rgba(86,204,242,0.3);
+      border-radius: 50px;
+      color: #56ccf2;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .refresh-btn:hover {
+      background: rgba(86,204,242,0.25);
+      box-shadow: 0 0 20px rgba(86,204,242,0.2);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    {% if weather.error %}
+    <div class="error-card">
+      <div class="error-icon">⚠️</div>
+      <h2>تعذّر تحميل بيانات الطقس</h2>
+      <p>{{ weather.error }}</p>
+      <button class="refresh-btn" onclick="location.reload()">إعادة المحاولة</button>
+    </div>
+
+    {% else %}
+    <div class="card">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="city-badge">
+          <span class="dot"></span>
+          {{ weather.city }} &ndash; {{ weather.country }}
+        </div>
+
+        <img
+          class="weather-icon"
+          src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png"
+          alt="{{ weather.description }}"
+        />
+
+        <div class="temp-display">{{ weather.temp }}<sup>°</sup></div>
+        <div class="description">{{ weather.description }}</div>
+        <div class="feels-like">يبدو كأنه {{ weather.feels_like }}°</div>
+
+        <div class="minmax">
+          <span><span class="arrow arrow-up">▲</span> {{ weather.temp_max }}°</span>
+          <span><span class="arrow arrow-down">▼</span> {{ weather.temp_min }}°</span>
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-icon icon-blue">💧</div>
+          <div class="stat-info">
+            <div class="stat-label">الرطوبة</div>
+            <div class="stat-value">{{ weather.humidity }}<span class="stat-unit">%</span></div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon icon-orange">💨</div>
+          <div class="stat-info">
+            <div class="stat-label">سرعة الرياح</div>
+            <div class="stat-value">{{ weather.wind_speed }}<span class="stat-unit">كم/س</span></div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon icon-purple">🌡️</div>
+          <div class="stat-info">
+            <div class="stat-label">الضغط الجوي</div>
+            <div class="stat-value">{{ weather.pressure }}<span class="stat-unit">hPa</span></div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon icon-teal">👁️</div>
+          <div class="stat-info">
+            <div class="stat-label">مدى الرؤية</div>
+            <div class="stat-value">{{ weather.visibility }}<span class="stat-unit">كم</span></div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon icon-green">☁️</div>
+          <div class="stat-info">
+            <div class="stat-label">تغطية السحاب</div>
+            <div class="stat-value">{{ weather.clouds }}<span class="stat-unit">%</span></div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon icon-pink">🧭</div>
+          <div class="stat-info">
+            <div class="stat-label">اتجاه الرياح</div>
+            <div class="stat-value">{{ weather.wind_deg }}<span class="stat-unit">°</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sunrise / Sunset -->
+      <div class="sun-strip">
+        <div class="sun-item">
+          <div class="sun-icon">🌅</div>
+          <div class="sun-label">شروق الشمس</div>
+          <div class="sun-time" id="sunrise" data-ts="{{ weather.sunrise }}">—</div>
+        </div>
+        <div class="sun-item">
+          <div class="sun-icon">🌇</div>
+          <div class="sun-label">غروب الشمس</div>
+          <div class="sun-time" id="sunset" data-ts="{{ weather.sunset }}">—</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        المصدر: OpenWeatherMap &bull; يتجدد عند كل زيارة
+        <button class="refresh-btn" onclick="location.reload()">🔄 تحديث</button>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+
+  <script>
+    function fmtTime(unix) {
+      const d = new Date(unix * 1000);
+      return d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    const srEl = document.getElementById('sunrise');
+    const ssEl = document.getElementById('sunset');
+    if (srEl) srEl.textContent = fmtTime(+srEl.dataset.ts);
+    if (ssEl) ssEl.textContent = fmtTime(+ssEl.dataset.ts);
+  </script>
+</body>
+</html>
