@@ -1,11 +1,14 @@
 from flask import Flask, render_template, jsonify
+from dotenv import load_dotenv
 import urllib.request
 import json
 import os
 
+load_dotenv()
+
 app = Flask(__name__)
 
-API_KEY = os.environ.get("OPENWEATHER_API_KEY", "YOUR_API_KEY_HERE")
+API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
 CITY = "Taif"
 COUNTRY = "SA"
 UNITS = "metric"
