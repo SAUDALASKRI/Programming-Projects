@@ -1,3 +1,4 @@
+            // Automating with Hooks is fun!
 import { getUser } from "@/actions";
 import { getProjects } from "@/actions/get-projects";
 import { createProject } from "@/actions/create-project";

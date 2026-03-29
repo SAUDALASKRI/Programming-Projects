@@ -105,7 +105,7 @@ export function PreviewFrame() {
           <div className="text-center max-w-md">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
               <svg
-                className="h-8 w-8 text-blue-600"
+                className="h-8 w-8 text-yellow-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

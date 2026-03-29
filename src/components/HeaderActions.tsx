@@ -69,9 +69,8 @@ export function HeaderActions({ user, projectId }: HeaderActionsProps) {
 
   const currentProject = projects.find((p) => p.id === projectId);
 
-  const handleSignInClick = () => {
-    setAuthMode("signin");
-    setAuthDialogOpen(true);
+  const handleLoginClick = () => {
+    router.push("/login");
   };
 
   const handleSignUpClick = () => {
@@ -96,11 +95,18 @@ export function HeaderActions({ user, projectId }: HeaderActionsProps) {
     return (
       <>
         <div className="flex gap-2">
-          <Button variant="outline" className="h-8" onClick={handleSignInClick}>
-            Sign In
-          </Button>
-          <Button className="h-8" onClick={handleSignUpClick}>
+          <Button
+            variant="outline"
+            className="h-8 border-violet-500/50 text-violet-300 bg-transparent hover:bg-violet-950/60 hover:text-violet-200 hover:border-violet-400 transition-all"
+            onClick={handleSignUpClick}
+          >
             Sign Up
+          </Button>
+          <Button
+            className="h-8 bg-indigo-600 hover:bg-indigo-500 text-white border border-violet-500 shadow-[0_0_12px_2px_rgba(168,85,247,0.6)] hover:shadow-[0_0_20px_6px_rgba(168,85,247,0.8)] hover:scale-[1.03] transition-all"
+            onClick={handleLoginClick}
+          >
+            Login
           </Button>
         </div>
         <AuthDialog
@@ -117,26 +123,32 @@ export function HeaderActions({ user, projectId }: HeaderActionsProps) {
       {!initialLoading && (
         <Popover open={projectsOpen} onOpenChange={setProjectsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-8 gap-2" role="combobox">
+            <Button
+              variant="outline"
+              className="h-8 gap-2 border-violet-500/40 text-violet-300 bg-transparent hover:bg-violet-950/60 hover:text-violet-200 hover:border-violet-400 transition-all"
+              role="combobox"
+            >
               <FolderOpen className="h-4 w-4" />
               {currentProject ? currentProject.name : "Select Project"}
               <ChevronDown className="h-3 w-3 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-0" align="end">
-            <Command>
+          <PopoverContent className="w-[300px] p-0 bg-slate-900 border border-violet-900/50" align="end">
+            <Command className="bg-slate-900">
               <CommandInput
                 placeholder="Search projects..."
                 value={searchQuery}
                 onValueChange={setSearchQuery}
+                className="text-slate-200 placeholder:text-slate-500"
               />
               <CommandList>
-                <CommandEmpty>No projects found.</CommandEmpty>
+                <CommandEmpty className="text-slate-400">No projects found.</CommandEmpty>
                 <CommandGroup>
                   {filteredProjects.map((project) => (
                     <CommandItem
                       key={project.id}
                       value={project.name}
+                      className="text-slate-200 data-[selected=true]:bg-violet-900/40 data-[selected=true]:text-violet-200"
                       onSelect={() => {
                         router.push(`/${project.id}`);
                         setProjectsOpen(false);
@@ -155,7 +167,10 @@ export function HeaderActions({ user, projectId }: HeaderActionsProps) {
         </Popover>
       )}
 
-      <Button className="flex items-center gap-2 h-8" onClick={handleNewDesign}>
+      <Button
+        className="flex items-center gap-2 h-8 bg-indigo-600 hover:bg-indigo-500 text-white border border-violet-500 shadow-[0_0_12px_2px_rgba(168,85,247,0.6)] hover:shadow-[0_0_20px_6px_rgba(168,85,247,0.8)] hover:scale-[1.03] transition-all"
+        onClick={handleNewDesign}
+      >
         <Plus className="h-4 w-4" />
         New Design
       </Button>
@@ -163,7 +178,7 @@ export function HeaderActions({ user, projectId }: HeaderActionsProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8"
+        className="h-8 w-8 text-slate-400 hover:text-violet-300 hover:bg-violet-950/60 transition-all"
         onClick={handleSignOut}
         title="Sign out"
       >

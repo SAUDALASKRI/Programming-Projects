@@ -9,6 +9,7 @@ import {
   Folder,
   FolderOpen,
   FileCode,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,7 +20,7 @@ interface FileTreeNodeProps {
 }
 
 function FileTreeNode({ node, level }: FileTreeNodeProps) {
-  const { selectedFile, setSelectedFile } = useFileSystem();
+  const { selectedFile, setSelectedFile, deleteFile } = useFileSystem();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleClick = () => {
@@ -28,6 +29,11 @@ function FileTreeNode({ node, level }: FileTreeNodeProps) {
     } else {
       setSelectedFile(node.path);
     }
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteFile(node.path);
   };
 
   const children =
@@ -45,7 +51,7 @@ function FileTreeNode({ node, level }: FileTreeNodeProps) {
     <div>
       <div
         className={cn(
-          "flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 cursor-pointer text-sm transition-colors",
+          "group flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 cursor-pointer text-sm transition-colors",
           selectedFile === node.path && "bg-blue-50 text-blue-600"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
@@ -59,9 +65,9 @@ function FileTreeNode({ node, level }: FileTreeNodeProps) {
               <ChevronRight className="h-3.5 w-3.5 shrink-0 text-gray-500" />
             )}
             {isExpanded ? (
-              <FolderOpen className="h-4 w-4 shrink-0 text-blue-500" />
+              <FolderOpen className="h-4 w-4 shrink-0 text-gray-400" />
             ) : (
-              <Folder className="h-4 w-4 shrink-0 text-blue-500" />
+              <Folder className="h-4 w-4 shrink-0 text-gray-400" />
             )}
           </>
         ) : (
@@ -70,7 +76,13 @@ function FileTreeNode({ node, level }: FileTreeNodeProps) {
             <FileCode className="h-4 w-4 shrink-0 text-gray-400" />
           </>
         )}
-        <span className="truncate text-gray-700">{node.name}</span>
+        <span className="truncate text-gray-700 flex-1">{node.name}</span>
+        <button
+          onClick={handleDelete}
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-50 rounded"
+        >
+          <Trash2 className="h-3.5 w-3.5 text-red-500" />
+        </button>
       </div>
       {node.type === "directory" && isExpanded && children.length > 0 && (
         <div>
